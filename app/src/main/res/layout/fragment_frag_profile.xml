@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white"
+    tools:context=".frag_profile">
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/Profile_image"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="30dp"
+        android:src="@drawable/profile_placeholder" />
+
+
+    <TextView
+        android:id="@+id/Profile_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Profile_image"
+        android:layout_marginTop="20dp"
+        android:text="Mayank Maurya"
+        android:textSize="20dp"
+        android:textColor="@color/black" />
+    <TextView
+        android:id="@+id/Profile_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Profile_name"
+        android:layout_marginTop="20dp"
+        android:text="mayank01000@gmail.com"
+        android:textSize="15dp"
+        android:textColor="@color/grey" />
+    <!--query views-->
+    <TextView
+        android:id="@+id/Profile_query_Views"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Profile_email"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="50dp"
+        android:text="99"
+        android:textSize="40dp"
+        android:textColor="@color/black" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Profile_query_Views"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="5dp"
+        android:text="Total \nViews"
+        android:textSize="15dp"
+        android:textAlignment="center"
+        />
+    <!--query views-->
+
+
+    <!--query likes-->
+    <TextView
+        android:id="@+id/Profile_query_likes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@+id/Profile_query_Views"
+        app:layout_constraintTop_toBottomOf="@+id/Profile_email"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="80dp"
+        android:text="14"
+        android:textSize="40dp"
+        android:textColor="@color/black" />
+    <TextView
+        android:id="@+id/tvtotallikes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@+id/Profile_query_Views"
+        app:layout_constraintTop_toBottomOf="@+id/Profile_query_Views"
+        android:layout_marginLeft="80dp"
+        android:layout_marginTop="5dp"
+        android:textSize="15dp"
+
+        android:text="Total \nLikes"
+        android:textAlignment="center"
+        />
+    <!--query Likes-->
+    <!--query asked-->
+    <TextView
+        android:id="@+id/Profile_query_asked"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@+id/Profile_query_likes"
+        app:layout_constraintTop_toBottomOf="@+id/Profile_email"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="80dp"
+        android:text="8"
+        android:textSize="40dp"
+        android:textColor="@color/black" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@+id/Profile_query_likes"
+        app:layout_constraintTop_toBottomOf="@+id/Profile_query_Views"
+        android:layout_marginLeft="80dp"
+        android:layout_marginTop="5dp"
+        android:text="Query \nAsked"
+        android:textSize="15dp"
+
+        android:textAlignment="center"
+        />
+    <!--query asked-->
+    <View
+        android:id="@+id/divider1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvtotallikes"
+        android:layout_marginTop="20dp"
+        style="@style/Divider.Horizontal"/>
+    <TextView
+        android:id="@+id/tvactivity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider1"
+        android:text="Activity"
+        android:textColor="@color/black"
+        android:textSize="30dp"
+        android:textAlignment="center"/>
+    <View
+        android:id="@+id/divider2"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvactivity"
+        style="@style/Divider.Horizontal"/>
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/divider2"
+        />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

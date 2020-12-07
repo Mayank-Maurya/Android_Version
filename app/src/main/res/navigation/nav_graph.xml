@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/home">
+
+    <fragment
+        android:id="@+id/home"
+        android:name="com.e.android_version.Fragment_home"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" />
+    <fragment
+        android:id="@+id/person"
+        android:name="com.e.android_version.frag_profile"
+        android:label="fragment_frag_profile"
+        tools:layout="@layout/fragment_frag_profile" />
+
+    <fragment
+        android:id="@+id/fire"
+        android:name="com.e.android_version.frag_fire"
+        android:label="fragment_frag_fire"
+        tools:layout="@layout/fragment_frag_fire" />
+    <fragment
+        android:id="@+id/settings"
+        android:name="com.e.android_version.frag_settings"
+        android:label="fragment_frag_settings"
+        tools:layout="@layout/fragment_frag_settings" />
+    <activity
+        android:id="@+id/addpost"
+        android:name="com.e.android_version.Add_Post"
+        android:label="activity_add__post"
+        tools:layout="@layout/activity_add__post">
+
+    </activity>
+</navigation>
