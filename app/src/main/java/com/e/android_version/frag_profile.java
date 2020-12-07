@@ -10,7 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-
+//perfect version
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
