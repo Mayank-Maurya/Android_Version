@@ -4,15 +4,225 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Add_Post">
+    tools:context=".Add_Post"
+    android:background="@color/background">
 
-    <Button
-        android:id="@+id/btn_addpost"
-        android:layout_width="220dp"
-        android:layout_height="77dp"
-        android:text="Add_post"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+<!--    app:layout_constraintBottom_toTopOf="@+id/addpost_conslayoyt2"-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/addpost_tvLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:text="@string/ask_something_meaningful"
+            android:textColor="@color/black"
+            android:textSize="22dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ScrollView
+            android:id="@+id/addpost_scrollview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="10dp"
+            android:background="@color/white"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/addpost_tvLabel">
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white">
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+
+                    <TextView
+                        android:id="@+id/addpost_tvlabel2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="10dp"
+                        android:text="Title"
+                        android:textColor="@color/black"
+                        android:textSize="15dp" />
+
+                    <TextView
+                        android:id="@+id/addpost_tvlabel3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="27dp"
+                        android:text="Please Keep it consise."
+                        android:textSize="10dp" />
+                    <EditText
+                        android:id="@+id/addpost_ettitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        android:layout_marginTop="40dp"
+                        />
+                    <TextView
+                        android:id="@+id/addpost_tvlabel4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toBottomOf="@id/addpost_ettitle"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="10dp"
+                        android:text="Body"
+                        android:textColor="@color/black"
+                        android:textSize="15dp" />
+
+                    <TextView
+                        android:id="@+id/addpost_tvlabel5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toBottomOf="@id/addpost_tvlabel4"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        android:layout_marginLeft="10dp"
+                        android:text="Include all the information about your question"
+                        android:textSize="10dp"
+                        />
+
+                    <EditText
+                        android:id="@+id/addpost_etbody"
+                        style="@android:style/Widget.Material.EditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textMultiLine"
+                        android:lines="6"
+                        android:maxLines="100"
+                        android:minLines="6"
+                        android:scrollbars="vertical"
+
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/addpost_tvlabel5" />
+                    <TextView
+                        android:id="@+id/addpost_tvlabel6"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toBottomOf="@id/addpost_etbody"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="10dp"
+                        android:text="Tags"
+                        android:textColor="@color/black"
+                        android:textSize="15dp" />
+
+                    <TextView
+                        android:id="@+id/addpost_tvlabel7"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toBottomOf="@id/addpost_tvlabel6"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        android:layout_marginLeft="10dp"
+                        android:text="Atmost 3"
+                        android:textSize="10dp" />
+
+                    <EditText
+                        android:id="@+id/addpost_tag1"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:hint="Tag1"
+                        android:layout_marginTop="10dp"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/addpost_tvlabel7"
+                        android:layout_marginLeft="20dp"
+                        />
+                    <EditText
+                        android:id="@+id/addpost_tag2"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:hint="Tag2"
+                        android:layout_marginTop="10dp"
+                        app:layout_constraintLeft_toLeftOf="@+id/addpost_tag1"
+                        app:layout_constraintTop_toBottomOf="@+id/addpost_tvlabel7"
+                        android:layout_marginLeft="120dp"/>
+                    <EditText
+                        android:id="@+id/addpost_tag3"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:hint="Tag3"
+                        android:layout_marginTop="10dp"
+                        app:layout_constraintLeft_toLeftOf="@+id/addpost_tag2"
+                        app:layout_constraintTop_toBottomOf="@+id/addpost_tvlabel7"
+                        android:layout_marginLeft="120dp"/>
+
+
+
+
+
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+
+
+            </androidx.cardview.widget.CardView>
+
+
+
+
+        </ScrollView>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/addpost_conslayoyt2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+        <Button
+            android:id="@+id/btn_addpost"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Submit"
+            android:background="@color/navy_blue"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+           />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

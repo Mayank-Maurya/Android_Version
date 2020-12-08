@@ -13,6 +13,9 @@
     <color name="Toolbarcolor">#82CCDD</color>
     <color name="grey">#5E5E5E</color>
     <color name="orange">#FA2C2C</color>
+    <color name="background">#fff7f2</color>
+    <color name="navy_blue">#03A9F4</color>
+
 
 
 </resources>
