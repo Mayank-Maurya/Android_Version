@@ -83,21 +83,18 @@ public class SignupActivity extends AppCompatActivity {
 
         //validating
 
-        Signup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        Signup.setOnClickListener(view -> {
 
-                if(isvaliddetails())
-                {
-                    signitup(u,p);
-                }else{
-                    Toast.makeText(SignupActivity.this, "Validation failed Signup again",
-                            Toast.LENGTH_SHORT).show();
-
-                }
-
+            if(isvaliddetails())
+            {
+                signitup(u,p);
+            }else{
+                Toast.makeText(SignupActivity.this, "Validation failed Signup again",
+                        Toast.LENGTH_SHORT).show();
 
             }
+
+
         });
 
 
