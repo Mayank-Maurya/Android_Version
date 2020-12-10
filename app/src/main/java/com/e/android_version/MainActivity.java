@@ -33,9 +33,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         mAuth= FirebaseAuth.getInstance();
         firebasedb=FirebaseFirestore.getInstance();
-
-
-
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View header=navigationView.getHeaderView(0);
@@ -50,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 if(task.isSuccessful())
                 {
-                    //name_tv.setText(task.getResult().get("name").toString());
+                    name_tv.setText(task.getResult().get("name").toString());
                 }
 
             });
@@ -81,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }else {
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                     startActivity(intent);
+                    this.finish();
                 }
 
                 return true;
@@ -89,6 +87,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if(mAuth.getCurrentUser()!=null)
                 {
                     mAuth.signOut();
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    this.finish();
                 }else {
                     Toast.makeText(MainActivity.this,"you haven't logged in",Toast.LENGTH_SHORT).show();
                 }
