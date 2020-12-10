@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -18,29 +19,29 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-
+import com.google.firebase.firestore.FirebaseFirestore;
 public class SignupActivity extends AppCompatActivity {
+
     String u="";
     String p="";
     private TextView logintv;
     private FirebaseAuth mAuth;
     private EditText useremail;
-    private EditText username;
     private EditText userpassword;
     private EditText userconfirmpass;
     private Button Signup;
     private CheckBox checkBox;
     private TextView terms;
-
+    private FirebaseFirestore firebasedb;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
         //initializing
+        firebasedb=FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         logintv=findViewById(R.id.logintv);
         useremail=findViewById(R.id.useremail);
-        username=findViewById(R.id.username);
         userpassword=findViewById(R.id.userpassword);
         userconfirmpass=findViewById(R.id.userconfirmpass);
         Signup=findViewById(R.id.btnsignup);
@@ -90,24 +91,23 @@ public class SignupActivity extends AppCompatActivity {
 
 
     }
-    void signitup(String useremail,String userpass)
+    void signitup(String useremail,String userpass )
     {
         mAuth.createUserWithEmailAndPassword(useremail,userpass)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(task.isSuccessful())
-                        {
-                            Toast.makeText(SignupActivity.this, "User Registered Succesfully: login again", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(SignupActivity.this,LoginActivity.class));
-                            finish();
-                        }else{
+                .addOnCompleteListener(this, task -> {
+                    if(task.isSuccessful())
+                    {
 
-                            Toast.makeText(SignupActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
 
+                        Toast.makeText(SignupActivity.this, "User Registered Succesfully: login again", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(SignupActivity.this,LoginActivity.class));
+                        finish();
+                    }else{
+
+                        Toast.makeText(SignupActivity.this, "Authentication failed.",
+                                Toast.LENGTH_SHORT).show();
                     }
+
                 });
 
     }
@@ -115,17 +115,13 @@ public class SignupActivity extends AppCompatActivity {
     boolean isvaliddetails()
     {
         String uemail=useremail.getText().toString();
-        String usernm=username.getText().toString();
         String upass=userpassword.getText().toString();
         String ucfmpass=userconfirmpass.getText().toString();
         if(! isValidEmail(uemail))
         {
             Toast.makeText(this, "Sorry: your email is not in a valid format", Toast.LENGTH_SHORT).show();
         }else{
-            if(usernm.length()<=3)
-            {
-                Toast.makeText(this, "Sorry: username length must be greater than 3", Toast.LENGTH_SHORT).show();
-            }else{
+
                 if(upass.length()<6)
                 {
                     Toast.makeText(this, "Sorry: your password length must be larger than 6", Toast.LENGTH_SHORT).show();
@@ -137,6 +133,7 @@ public class SignupActivity extends AppCompatActivity {
                         if(checkBox.isChecked()) {
                             u=uemail;
                             p=upass;
+
                             return true;
                         }else{
                             Toast.makeText(this, "Sorry: You haven't selected terms and policy.", Toast.LENGTH_SHORT).show();
@@ -145,7 +142,7 @@ public class SignupActivity extends AppCompatActivity {
 
                     }
                 }
-            }
+
         }
         return false;
 

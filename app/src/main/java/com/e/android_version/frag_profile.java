@@ -14,6 +14,8 @@ import androidx.fragment.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -21,6 +23,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -40,10 +45,13 @@ public class frag_profile extends Fragment {
     private CircleImageView profileimage;
     private StorageReference storageReference;
     private FirebaseAuth mAuth;
-    private FirebaseUser current_user=null;
     private FirebaseStorage firebaseStorage;
-
-
+    private FirebaseFirestore firebasedb;
+    private TextView nametv;
+    private TextView emailtv;
+    private TextView totalviews;
+    private TextView totallikes;
+    private TextView queryasked;
     private String mParam1;
     private String mParam2;
 
@@ -79,17 +87,41 @@ public class frag_profile extends Fragment {
         final View rootview=inflater.inflate(R.layout.fragment_frag_profile, container, false);
         profileimage= rootview.findViewById(R.id.Profile_image);
         mAuth=FirebaseAuth.getInstance();
-        current_user=mAuth.getCurrentUser();
         firebaseStorage=FirebaseStorage.getInstance();
         storageReference =firebaseStorage.getReference();
-        if(current_user!=null)
-        {
-//            String user=current_user.getUid();
-//            String image=firebaseStorage.getDownloadUrl("gs://android-version-91d30.appspot.com/Profile_Image/").
-//            Glide.with(frag_profile.this)
-//                    .load(image)
-//                    .into(profileimage);
+        nametv=rootview.findViewById(R.id.Profile_name);
+        emailtv=rootview.findViewById(R.id.Profile_email);
+        totallikes=rootview.findViewById(R.id.Profile_query_likes);
+        totalviews=rootview.findViewById(R.id.Profile_query_Views);
+        queryasked=rootview.findViewById(R.id.Profile_query_asked);
+        firebasedb=FirebaseFirestore.getInstance();
+
+        if(mAuth.getCurrentUser() != null) {
+            String id = mAuth.getCurrentUser().getUid();
+
+
+            //database
+            firebasedb.collection("users").document(id).get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    emailtv.setText(task.getResult().get("email").toString());
+                    nametv.setText(task.getResult().get("name").toString());
+
+
+                    totallikes.setText(String.valueOf(((Long) task.getResult().get("total_likes")).intValue()));
+                    totalviews.setText(String.valueOf(((Long) task.getResult().get("total_views")).intValue()));
+                    queryasked.setText(String.valueOf(((Long) task.getResult().get("query_asked")).intValue()));
+                } else {
+                    Toast.makeText(getActivity(), "found nothing", Toast.LENGTH_SHORT).show();
+                }
+
+            });
         }
+
+
+
+
+
+
         profileimage.setOnClickListener(view -> CropImage.activity()
                 .setGuidelines(CropImageView.Guidelines.ON)
                 .setAspectRatio(1,1)
