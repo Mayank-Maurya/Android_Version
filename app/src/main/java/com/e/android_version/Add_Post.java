@@ -3,18 +3,25 @@ package com.e.android_version;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.lang.reflect.Array;
+import java.net.URI;
 import java.security.PrivateKey;
 import java.util.Arrays;
 import java.util.Date;
@@ -33,7 +40,10 @@ public class Add_Post extends AppCompatActivity {
     private EditText Tag2;
     private EditText Tag3;
     private ProgressBar progressBar;
-
+    private StorageReference storageReference;
+    private FirebaseStorage firebaseStorage;
+    private ImageView imageView;
+    private Uri post_img_uri=null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,11 +55,29 @@ public class Add_Post extends AppCompatActivity {
         Tag1=findViewById(R.id.addpost_tag1);
         Tag2=findViewById(R.id.addpost_tag2);
         Tag3=findViewById(R.id.addpost_tag3);
+        imageView=findViewById(R.id.addpost_profile_image);
         progressBar=findViewById(R.id.progressBar);
         firebaseAuth=FirebaseAuth.getInstance();
         firebasedb=FirebaseFirestore.getInstance();
-        addpost.setOnClickListener(view -> {
+        firebaseStorage=FirebaseStorage.getInstance();
+        storageReference=firebaseStorage.getReference();
 
+        String name=firebasedb.collection("users")
+                .document(firebaseAuth.getCurrentUser()
+                        .getUid())
+                .get()
+                .getResult().get("name").toString();
+
+        imageView.setOnClickListener(view -> {
+            CropImage.activity()
+                    .setGuidelines(CropImageView.Guidelines.ON)
+                    .setAspectRatio(1, 1)
+                    .start(this);
+                });
+
+
+
+        addpost.setOnClickListener(view -> {
             progressBar.setVisibility(View.VISIBLE);
             if(firebaseAuth.getCurrentUser()!=null)
             {
@@ -67,6 +95,8 @@ public class Add_Post extends AppCompatActivity {
                 dataset.put("answercount",0);
                 dataset.put("views",0);
                 dataset.put("likes",0);
+                dataset.put("postimg",0);
+                dataset.put("name",name);
                 dataset.put("userId",firebaseAuth.getCurrentUser().getUid());
 //                String s=firebasedb.collection("users")
 //                        .document(firebaseAuth.getCurrentUser()
@@ -94,6 +124,25 @@ public class Add_Post extends AppCompatActivity {
 
 
 
+                Map<String,Object> dataset1=new HashMap<>();
+                dataset1.put("name",name);
+
+                StorageReference image_path = storageReference.child("post_images").child("mayank.jpg");
+
+                image_path.putFile(post_img_uri).addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(Add_Post.this, "picture uploaded", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(Add_Post.this, "picture Failed to upload", Toast.LENGTH_SHORT).show();
+                    }
+
+                });
+
+
+
+
+
+
             }else{
 
                 Toast.makeText(Add_Post.this,"User haven't logged in.",Toast.LENGTH_SHORT).show();
@@ -109,6 +158,27 @@ public class Add_Post extends AppCompatActivity {
 
 
 
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                post_img_uri = result.getUri();
+
+                imageView.setImageURI(post_img_uri);
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+            }
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
 
     }
 }

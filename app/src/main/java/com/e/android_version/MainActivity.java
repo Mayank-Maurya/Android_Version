@@ -1,4 +1,4 @@
-package com.e.android_version;
+ package com.e.android_version;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,6 +13,10 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.Priority;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -48,6 +52,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if(task.isSuccessful())
                 {
                     name_tv.setText(task.getResult().get("name").toString());
+                    RequestOptions options= new RequestOptions()
+                            .centerCrop()
+                            .placeholder(R.drawable.profile_placeholder)
+                            .error(R.drawable.profile_placeholder)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .priority(Priority.HIGH)
+                            .dontAnimate()
+                            .dontTransform();
+                    Glide.with(MainActivity.this)
+                            .load(task.getResult().get("profileimg").toString())
+                            .apply(options)
+                            .into(nav_image_view);
                 }
 
             });

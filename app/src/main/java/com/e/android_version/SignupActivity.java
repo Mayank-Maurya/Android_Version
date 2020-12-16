@@ -55,21 +55,26 @@ public class SignupActivity extends AppCompatActivity {
             startActivity(new Intent(SignupActivity.this,LoginActivity.class));
             finish();
         });
-        terms.setOnClickListener(view -> new AlertDialog.Builder(SignupActivity.this)
-                .setTitle("policy")
-                .setMessage("The Terms And Conditions For Registering You as a reponsible user is :\n"+"1: You don't Post Unneccesary questions.\n"
-                        +"2: always give your original email address.\n"+"3:be humble to answer everybody.\n")
+        terms.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new AlertDialog.Builder(SignupActivity.this)
+                        .setTitle("policy")
+                        .setMessage("The Terms And Conditions For Registering You as a reponsible user is :\n" + "1: You don't Post Unneccesary questions.\n"
+                                + "2: always give your original email address.\n" + "3:be humble to answer everybody.\n")
 
-                // Specifying a listener allows you to take an action before dismissing the dialog.
-                // The dialog is automatically dismissed when a dialog button is clicked.
-                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
-                    // Continue with delete operation
-                })
+                        // Specifying a listener allows you to take an action before dismissing the dialog.
+                        // The dialog is automatically dismissed when a dialog button is clicked.
+                        .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                            // Continue with delete operation
+                        })
 
-                // A null listener allows the button to dismiss the dialog and take no further action.
-                .setNegativeButton(android.R.string.no, null)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show());
+                        // A null listener allows the button to dismiss the dialog and take no further action.
+                        .setNegativeButton(android.R.string.no, null)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+        });
 
 
         //validating

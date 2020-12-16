@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -99,15 +100,21 @@ public class LoginActivity extends AppCompatActivity {
                             DocumentReference documentReference=firebasedb.collection("users")
                                     .document(Auth.getCurrentUser().getUid());
                             documentReference.get()
+                                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+                                        }
+                                    })
                                     .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                         @Override
-                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        public void onComplete(@NonNull Task<DocumentSnapshot> task1) {
 
-                                            if(task.isSuccessful())
+                                            if(task1.isSuccessful())
                                             {
 
 
-                                                DocumentSnapshot doc=task.getResult();
+                                                DocumentSnapshot doc=task1.getResult();
 
 
                                                 //logging in first time
@@ -123,12 +130,13 @@ public class LoginActivity extends AppCompatActivity {
                                                     initialdata.put("query_asked", 0);
                                                     initialdata.put("total_likes", 0);
                                                     initialdata.put("total_views", 0);
+                                                    initialdata.put("profileimg", 0);
 
                                                     firebasedb.collection("users").document(Auth.getCurrentUser().getUid())
                                                             .set(initialdata)
-                                                            .addOnCompleteListener(task1->{
-                                                                Toast.makeText(LoginActivity.this,"Users data created successfully"
-                                                                        ,Toast.LENGTH_SHORT).show();
+                                                            .addOnCompleteListener(task2->{
+                                                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                                                finish();
 
 
 
@@ -138,6 +146,10 @@ public class LoginActivity extends AppCompatActivity {
                                                                         ,Toast.LENGTH_SHORT).show();
 
                                                             });
+
+                                                }else{
+                                                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                                    finish();
 
                                                 }
                                             }
@@ -150,8 +162,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
-                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                            finish();
+
 
                         } else {
                             Log.i("signInWithEmail:failure", task.getException() + "");
