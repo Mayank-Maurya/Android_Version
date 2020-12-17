@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".Fragment_home">
+    tools:context=".Fragment_home"
+    android:background="@color/background">
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/Query_post_recyclerview"
         android:layout_width="match_parent"
@@ -13,7 +14,6 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:listitem="@layout/queryasked_list_item"
-        />
+        tools:listitem="@layout/queryasked_list_item" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

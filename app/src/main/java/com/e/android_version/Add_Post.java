@@ -1,5 +1,6 @@
 package com.e.android_version;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -12,11 +13,18 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -28,6 +36,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class Add_Post extends AppCompatActivity {
 
@@ -44,6 +53,8 @@ public class Add_Post extends AppCompatActivity {
     private FirebaseStorage firebaseStorage;
     private ImageView imageView;
     private Uri post_img_uri=null;
+    private  String name="";
+    private String Downloadurl="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,26 +72,34 @@ public class Add_Post extends AppCompatActivity {
         firebasedb=FirebaseFirestore.getInstance();
         firebaseStorage=FirebaseStorage.getInstance();
         storageReference=firebaseStorage.getReference();
-
-        String name=firebasedb.collection("users")
-                .document(firebaseAuth.getCurrentUser()
-                        .getUid())
+        firebasedb.collection("users")
+                .document(firebaseAuth.getCurrentUser().getUid())
                 .get()
-                .getResult().get("name").toString();
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
 
+                        if(task.isSuccessful())
+                        {
+                            name=task.getResult().get("name").toString();
+                        }
+
+                    }
+                });
         imageView.setOnClickListener(view -> {
             CropImage.activity()
                     .setGuidelines(CropImageView.Guidelines.ON)
                     .setAspectRatio(1, 1)
                     .start(this);
-                });
 
 
-
+        });
         addpost.setOnClickListener(view -> {
             progressBar.setVisibility(View.VISIBLE);
             if(firebaseAuth.getCurrentUser()!=null)
             {
+
+
 
                 String title=Title.getText().toString();
                 String body=Body.getText().toString();
@@ -90,33 +109,66 @@ public class Add_Post extends AppCompatActivity {
                 Map<String,Object> dataset=new HashMap<>();
                 dataset.put("title",title);
                 dataset.put("mainQuestion",body);
-                dataset.put("timestamp",new Timestamp(new Date()));
+                dataset.put("timestamp", FieldValue.serverTimestamp());
                 dataset.put("tags",Arrays.asList(tag1,tag2,tag3));
                 dataset.put("answercount",0);
                 dataset.put("views",0);
                 dataset.put("likes",0);
-                dataset.put("postimg",0);
                 dataset.put("name",name);
+                dataset.put("profileimg",Downloadurl);
                 dataset.put("userId",firebaseAuth.getCurrentUser().getUid());
-//                String s=firebasedb.collection("users")
-//                        .document(firebaseAuth.getCurrentUser()
-//                                .getUid())
-//                        .get()
-//                        .getResult().get("name").toString();
-//
-//                dataset.put("username",s);
                 firebasedb.collection("question")
                         .add(dataset)
+                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                            @Override
+                            public void onSuccess(DocumentReference documentReference) {
+
+
+                                if(post_img_uri!=null)
+                                {
+                                    StorageReference image_path = storageReference.child("post_images").child(UUID.randomUUID().toString()+".jpg");
+
+                                    image_path.putFile(post_img_uri)
+                                            .addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+
+                                                    if(task.isSuccessful())
+                                                    {
+
+                                                        image_path.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                                            @Override
+                                                            public void onSuccess(Uri uri) {
+                                                                Downloadurl=uri.toString();
+                                                                Map<String,Object> mp=new HashMap<>();
+                                                                mp.put("profileimg",Downloadurl);
+                                                                firebasedb.collection("question").document(documentReference.getId())
+                                                                        .update(mp);
+                                                            }
+                                                        });
+
+                                                    }
+
+
+
+                                                }
+                                            });
+
+                                }
+                            }
+                        })
                         .addOnCompleteListener(task -> {
 
                             if(task.isSuccessful())
                             {
                                 progressBar.setVisibility(View.GONE);
                                 Toast.makeText(Add_Post.this,"Successfully asked a question",Toast.LENGTH_SHORT).show();
+                                startActivity(new Intent(Add_Post.this, MainActivity.class));
                                 this.finish();
                             }else{
                                 progressBar.setVisibility(View.GONE);
                                 Toast.makeText(Add_Post.this,"!Successfully asked a question",Toast.LENGTH_SHORT).show();
+                                startActivity(new Intent(Add_Post.this, MainActivity.class));
                                 this.finish();
                             }
 
@@ -124,19 +176,6 @@ public class Add_Post extends AppCompatActivity {
 
 
 
-                Map<String,Object> dataset1=new HashMap<>();
-                dataset1.put("name",name);
-
-                StorageReference image_path = storageReference.child("post_images").child("mayank.jpg");
-
-                image_path.putFile(post_img_uri).addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(Add_Post.this, "picture uploaded", Toast.LENGTH_SHORT).show();
-                    }else{
-                        Toast.makeText(Add_Post.this, "picture Failed to upload", Toast.LENGTH_SHORT).show();
-                    }
-
-                });
 
 
 
@@ -151,14 +190,8 @@ public class Add_Post extends AppCompatActivity {
             }
 
 
+
         });
-
-
-
-
-
-
-
     }
 
     @Override
@@ -176,9 +209,4 @@ public class Add_Post extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-    }
 }
