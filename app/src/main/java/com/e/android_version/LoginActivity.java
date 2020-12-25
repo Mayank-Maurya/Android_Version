@@ -25,6 +25,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -124,13 +125,27 @@ public class LoginActivity extends AppCompatActivity {
                                                 {
                                                     Map<String,Object> initialdata=new HashMap<>();
                                                     initialdata.put("name", "Not Provided");
-                                                    initialdata.put("dob", "Not Provided");
+                                                    initialdata.put("dob", "_");
                                                     initialdata.put("email", Auth.getCurrentUser().getEmail());
-                                                    initialdata.put("phone", "Not Provided");
+                                                    initialdata.put("phone", "_");
                                                     initialdata.put("query_asked", 0);
-                                                    initialdata.put("total_likes", 0);
+                                                    initialdata.put("total_answer", 0);
                                                     initialdata.put("total_views", 0);
-                                                    initialdata.put("profileimg", 0);
+                                                    initialdata.put("profileimg", "");
+
+                                                    Map<String,Object> temp_data=new HashMap<>();
+                                                    temp_data.put("achievements","_");
+                                                    temp_data.put("contribution","_");
+                                                    Map<String,Object> temp_data1=new HashMap<>();
+                                                    temp_data1.put("codechef","_");
+                                                    temp_data1.put("codeforces","_");
+                                                    temp_data1.put("github","_");
+                                                    temp_data.put("profileLinks",temp_data1);
+                                                    temp_data.put("projects", Arrays.asList("",""));
+                                                    temp_data.put("tags",Arrays.asList("",""));
+                                                    temp_data.put("achievements","_");
+                                                    temp_data.put("achievements","_");
+                                                    initialdata.put("about",temp_data);
 
                                                     firebasedb.collection("users").document(Auth.getCurrentUser().getUid())
                                                             .set(initialdata)

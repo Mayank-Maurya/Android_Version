@@ -4,30 +4,35 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FieldValue;
 
 import java.util.Arrays;
+import java.util.Date;
 
 public class QueryPost {
 
-    public String userid,title,name;
+    public String userId,title,name,questionId;
     public int likes,views,comments;
-   // public FieldValue timestamp;
+    //public Date timestamp;
    // public Arrays tags[];
-
 
     public QueryPost(){}
 
-    public QueryPost(String userid,String title,String name, int likes, int views, int comments) {
-        this.userid = userid;
+
+    public QueryPost(String userId,String title,String name, int likes, int views, int comments,String questionId) {
+        this.userId = userId;
         this.title = title;
         this.name=name;
         this.likes = likes;
         this.views = views;
         this.comments = comments;
-        //this.timestamp = timestamp;
+        this.questionId=questionId;
+       // this.timestamp = timestamp;
        // this.tags = tags;
     }
 
-    public String getUserid() {
-        return userid;
+    public String getUserId() {
+        return userId;
+    }
+    public String getQuestionId(){
+        return questionId;
     }
 
     public String getQuestiontitle() {
@@ -49,12 +54,12 @@ public class QueryPost {
         return comments;
     }
 
-  //  public FieldValue getTimestamp() {
-        //return timestamp;
-    //}
-
-//    public Arrays[] getTags() {
-//        return tags;
+//    public Date getTimestamp() {
+//        return timestamp;
+//    }
+//    public void setTimestamp(Date timestamp)
+//    {
+//        this.timestamp=timestamp;
 //    }
 
 

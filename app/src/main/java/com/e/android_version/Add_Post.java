@@ -116,7 +116,11 @@ public class Add_Post extends AppCompatActivity {
                 dataset.put("likes",0);
                 dataset.put("name",name);
                 dataset.put("profileimg",Downloadurl);
+                dataset.put("questionId","_");
                 dataset.put("userId",firebaseAuth.getCurrentUser().getUid());
+
+
+
                 firebasedb.collection("question")
                         .add(dataset)
                         .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -124,34 +128,29 @@ public class Add_Post extends AppCompatActivity {
                             public void onSuccess(DocumentReference documentReference) {
 
 
+
                                 if(post_img_uri!=null)
                                 {
                                     StorageReference image_path = storageReference.child("post_images").child(UUID.randomUUID().toString()+".jpg");
 
                                     image_path.putFile(post_img_uri)
-                                            .addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                                            .addOnCompleteListener(task -> {
 
-                                                    if(task.isSuccessful())
-                                                    {
+                                                if(task.isSuccessful())
+                                                {
 
-                                                        image_path.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                                            @Override
-                                                            public void onSuccess(Uri uri) {
-                                                                Downloadurl=uri.toString();
-                                                                Map<String,Object> mp=new HashMap<>();
-                                                                mp.put("profileimg",Downloadurl);
-                                                                firebasedb.collection("question").document(documentReference.getId())
-                                                                        .update(mp);
-                                                            }
-                                                        });
-
-                                                    }
-
-
+                                                    image_path.getDownloadUrl().addOnSuccessListener(uri -> {
+                                                        Downloadurl=uri.toString();
+                                                        Map<String,Object> mp=new HashMap<>();
+                                                        mp.put("profileimg",Downloadurl);
+                                                        firebasedb.collection("question").document(documentReference.getId())
+                                                                .update(mp);
+                                                    });
 
                                                 }
+
+
+
                                             });
 
                                 }
@@ -161,6 +160,23 @@ public class Add_Post extends AppCompatActivity {
 
                             if(task.isSuccessful())
                             {
+
+                                Map<String,Object> mp1=new HashMap<>();
+                                mp1.put("questionId",task.getResult().getId());
+                                mp1.put("timestamp",FieldValue.serverTimestamp());
+
+                                firebasedb.collection("users")
+                                        .document(firebaseAuth.getCurrentUser().getUid())
+                                        .collection("questions")
+                                        .add(mp1);
+
+
+                                Map<String,Object> mp=new HashMap<>();
+                                mp.put("questionId",task.getResult().getId());
+
+                                firebasedb.collection("question")
+                                        .document(task.getResult().getId())
+                                        .update(mp);
                                 progressBar.setVisibility(View.GONE);
                                 Toast.makeText(Add_Post.this,"Successfully asked a question",Toast.LENGTH_SHORT).show();
                                 startActivity(new Intent(Add_Post.this, MainActivity.class));

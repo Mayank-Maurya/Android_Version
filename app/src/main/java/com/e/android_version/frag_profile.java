@@ -103,7 +103,7 @@ public class frag_profile extends Fragment {
                     if (task.isSuccessful()) {
                         emailtv.setText(task.getResult().get("email").toString());
                         nametv.setText(task.getResult().get("name").toString());
-                        totallikes.setText(String.valueOf(((Long) task.getResult().get("total_likes")).intValue()));
+                        totallikes.setText(String.valueOf(((Long) task.getResult().get("total_answer")).intValue()));
                         totalviews.setText(String.valueOf(((Long) task.getResult().get("total_views")).intValue()));
                         queryasked.setText(String.valueOf(((Long) task.getResult().get("query_asked")).intValue()));
                         if(task.getResult().get("profileimg").toString() != null)

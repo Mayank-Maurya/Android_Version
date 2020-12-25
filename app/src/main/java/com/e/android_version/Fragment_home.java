@@ -16,11 +16,13 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
@@ -41,6 +43,9 @@ public class Fragment_home extends Fragment {
 
     private FirebaseFirestore firebaseFirestore;
     private QuerypostRecyclerAdapter querypostRecyclerAdapter;
+    private FirebaseAuth firebaseAuth;
+    private DocumentSnapshot lastvisible;
+    private Boolean firstpageload=true;
 
     public Fragment_home() {
 
@@ -79,37 +84,137 @@ public class Fragment_home extends Fragment {
         querypost_recyclerView.setAdapter(querypostRecyclerAdapter);
 
 
+        firebaseAuth=FirebaseAuth.getInstance();
         firebaseFirestore=FirebaseFirestore.getInstance();
 
 
 
-        firebaseFirestore.collection("question")
-                .addSnapshotListener((value, error) -> {
-                    if(isAdded()){
+        //Sorting the queries in descending order w.r.t timestamp
 
-                        if(error!=null)
-                        {
-                            Toast.makeText(getContext(),"Nothing found",Toast.LENGTH_SHORT).show();
-                            return;
-                        }
+        if(firebaseAuth.getCurrentUser()!=null)
+        {
+            querypost_recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
 
-                        for(DocumentChange doc: value.getDocumentChanges())
-                        {
 
-                            if(doc.getType() == DocumentChange.Type.ADDED)
-                            {
-                                QueryPost queryPost=doc.getDocument().toObject(QueryPost.class);
+                    Boolean reachedBottom=!recyclerView.canScrollVertically(1);
+
+                    if(reachedBottom)
+                    {
+                        Toast.makeText(getContext(),"Reached",Toast.LENGTH_SHORT).show();
+                        loadpost();
+
+                    }
+
+
+
+                }
+            });
+
+
+
+
+            Query firstQuery=firebaseFirestore.collection("question")
+                    .orderBy("timestamp",Query.Direction.DESCENDING)
+                    .limit(6);
+
+
+
+
+            firstQuery.addSnapshotListener((value, error) -> {
+                if (Fragment_home.this.isAdded()) {
+
+                    if (error != null) {
+                        Toast.makeText(Fragment_home.this.getContext(), "Nothing found", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    if (firstpageload) {
+                        lastvisible = value.getDocuments().get(value.size() - 1);
+
+                    }
+
+
+                    for (DocumentChange doc : value.getDocumentChanges()) {
+
+                        if (doc.getType() == DocumentChange.Type.ADDED) {
+
+                            //String querypostid=doc.getDocument().getId();
+                            QueryPost queryPost = doc.getDocument().toObject(QueryPost.class);
+
+                            if (firstpageload) {
                                 queryPostList.add(queryPost);
-                                querypostRecyclerAdapter.notifyDataSetChanged();
+
+
+                            } else {
+                                queryPostList.add(0, queryPost);
 
                             }
+
+
+                            querypostRecyclerAdapter.notifyDataSetChanged();
 
                         }
 
                     }
-                });
+                    firstpageload = false;
+
+                }
+            });
+
+        }
+
+
+
 
         return view;
+    }
+
+    public void loadpost()
+    {
+        Query nextQuery=firebaseFirestore.collection("question")
+                .orderBy("timestamp",Query.Direction.DESCENDING)
+                .startAfter(lastvisible)
+                .limit(6);
+
+
+
+
+        nextQuery.addSnapshotListener((value, error) -> {
+            if(isAdded()){
+
+                if(error!=null)
+                {
+                    Toast.makeText(getContext(),"Nothing found",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if(!value.isEmpty())
+                {
+                    lastvisible = value.getDocuments().get(value.size() -1);
+
+
+                    for(DocumentChange doc: value.getDocumentChanges())
+                    {
+
+                        if(doc.getType() == DocumentChange.Type.ADDED)
+                        {
+                           // String querypostid=doc.getDocument().getId();
+
+                            QueryPost queryPost=doc.getDocument().toObject(QueryPost.class);
+                            queryPostList.add(queryPost);
+                            querypostRecyclerAdapter.notifyDataSetChanged();
+                        }
+
+                    }
+
+                }
+
+
+            }
+        });
+
     }
 
     @Override
@@ -119,25 +224,5 @@ public class Fragment_home extends Fragment {
 
 
 
-
-
-
-
-
-//        String[] Query_Post_List={"mayank is in trouble","he is awesome","help needed"};
-//        recyclerView=view.findViewById(R.id.Query_post_recyclerview);
-//        LinearLayoutManager layoutManager=new LinearLayoutManager(getActivity());
-//        recyclerView.setLayoutManager(layoutManager);
-//        adapter = new QueryPostAdapter(Query_Post_List);
-//        recyclerView.setAdapter(adapter);
-//        mLayoutManager = new LinearLayoutManager(getActivity());
-//        mLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-//
-//        mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
-//        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-//        mRecyclerView.setLayoutManager(mLayoutManager);
-//
-//        mAdapter = new ListingAdapter(mListing);
-//        mRecyclerView.setAdapter(mAdapter);
     }
 }
