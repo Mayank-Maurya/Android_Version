@@ -30,7 +30,6 @@ public class QueryPostFullView extends AppCompatActivity {
 
     private ImageView userImage;
     private TextView userName;
-    private TextView userEmail;
     private ImageView mainquesionImage;
     private TextView mainquestiontext;
     private Button submitAnswer;
@@ -46,7 +45,6 @@ public class QueryPostFullView extends AppCompatActivity {
         id=getIntent().getStringExtra("doc_id");
         userImage=findViewById(R.id.querypostfullview_useriv);
         userName=findViewById(R.id.querypostfullview_usernametv);
-        userEmail=findViewById(R.id.querypostfullview_useremail);
         mainquesionImage=findViewById(R.id.querypostfullview_mainimage);
         mainquestiontext=findViewById(R.id.querypostfullview_mainquestion);
         submitAnswer=findViewById(R.id.querypostfullview_writebtn);
@@ -55,12 +53,15 @@ public class QueryPostFullView extends AppCompatActivity {
         FirebaseUser isuserexists=firebaseAuth.getCurrentUser();
 
         submitAnswer.setOnClickListener(view -> {
-            startActivity(new Intent(this,QueryPostAnswers.class));
+            Intent intent=new Intent(this,QueryPostAnswers.class);
+            intent.putExtra("question_id",id);
+            startActivity(intent);
         });
 
 
         if(isuserexists!=null)
         {
+
             new MyTask().doInBackground(id);
 
             firebasedb.collection("question").document(id)
@@ -122,7 +123,7 @@ public class QueryPostFullView extends AppCompatActivity {
                                                 .apply(requestOptions)
                                                 .into(userImage);
 
-                                        userEmail.setText(task1.getResult().getString("email"));
+                                       // userEmail.setText(task1.getResult().getString("email"));
                                         userName.setText(task1.getResult().getString("name"));
                                     });
 

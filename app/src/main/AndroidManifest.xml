@@ -14,10 +14,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".AnswerSubmit"></activity>
         <activity
             android:name=".QueryPostAnswers"
             android:label="@string/title_activity_query_post_answers"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".QueryPostFullView" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
