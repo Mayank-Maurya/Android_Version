@@ -37,7 +37,6 @@ public class QuerypostRecyclerAdapter extends RecyclerView.Adapter<QuerypostRecy
     FirebaseFirestore firebaseFirestore;
     private Context context;
     private String id="";
-
     public List<QueryPost> queryPostList;
     public QuerypostRecyclerAdapter(List<QueryPost> queryPostList)
     {
