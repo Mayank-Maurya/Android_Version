@@ -30,11 +30,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QueryPostAnswers extends AppCompatActivity {
-
     private String id;
     private RecyclerView querypostans_recyclerView;
     private List<QueryPostAns> queryPostansList;
-
     private FirebaseFirestore firebaseFirestore;
     private QuerypostansRecycleradapter querypostansRecyclerAdapter;
     private FirebaseAuth firebaseAuth;
@@ -55,10 +53,8 @@ public class QueryPostAnswers extends AppCompatActivity {
         querypostans_recyclerView.setAdapter(querypostansRecyclerAdapter);
         firebaseAuth=FirebaseAuth.getInstance();
         firebaseFirestore=FirebaseFirestore.getInstance();
-
         if(firebaseAuth.getCurrentUser()!=null)
         {
-
             querypostans_recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
@@ -68,14 +64,12 @@ public class QueryPostAnswers extends AppCompatActivity {
 
                     if(reachedBottom)
                     {
-                       // Toast.makeText(QueryPostAnswers.this,"Reached",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(QueryPostAnswers.this,"Reached",Toast.LENGTH_SHORT).show();
                         loadmorepost();
 
                     }
                 }
             });
-
-
             Query firstquery=firebaseFirestore.collection("question")
                     .document(id)
                     .collection("answers")
@@ -101,13 +95,10 @@ public class QueryPostAnswers extends AppCompatActivity {
 
                     if (doc.getType() == DocumentChange.Type.ADDED) {
 
-                        //String querypostid=doc.getDocument().getId();
                         firebaseFirestore.collection("answer")
                                 .document(doc.getDocument().getString("answerID"))
                                 .get()
                                 .addOnSuccessListener(documentSnapshot -> {
-                                    Toast.makeText(this, "found", Toast.LENGTH_SHORT).show();
-
                                     QueryPostAns queryPostAns=documentSnapshot.toObject(QueryPostAns.class);
                                     if (firstpageload) {
                                         queryPostansList.add(queryPostAns);
@@ -115,14 +106,13 @@ public class QueryPostAnswers extends AppCompatActivity {
                                         queryPostansList.add(0, queryPostAns);
                                     }
                                     querypostansRecyclerAdapter.notifyDataSetChanged();
+
                                 });
                     }
                 }
                 firstpageload = false;
             }));
         }
-
-
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(view ->{
             Intent intent=new Intent(this,AnswerSubmit.class);
@@ -139,7 +129,6 @@ public class QueryPostAnswers extends AppCompatActivity {
                 .orderBy("timestamp",Query.Direction.DESCENDING)
                 .startAfter(lastvisible)
                 .limit(6);
-
         nextquery.addSnapshotListener(((value, error) -> {
             if(error!=null)
             {
@@ -150,28 +139,18 @@ public class QueryPostAnswers extends AppCompatActivity {
             {
                 lastvisible = value.getDocuments().get(value.size() - 1);
                 for (DocumentChange doc : value.getDocumentChanges()) {
-
                     if (doc.getType() == DocumentChange.Type.ADDED) {
-
                         firebaseFirestore.collection("answer")
                                 .document(doc.getDocument().getString("answerID"))
                                 .get()
                                 .addOnSuccessListener(documentSnapshot -> {
                                     QueryPostAns queryPostAns=documentSnapshot.toObject(QueryPostAns.class);
-                                    if (firstpageload) {
-                                        queryPostansList.add(queryPostAns);
-                                    } else {
-                                        queryPostansList.add( queryPostAns);
-                                    }
+                                    queryPostansList.add( queryPostAns);
                                     querypostansRecyclerAdapter.notifyDataSetChanged();
                                 });
                     }
                 }
-
             }
-
-
         }));
-
     }
 }

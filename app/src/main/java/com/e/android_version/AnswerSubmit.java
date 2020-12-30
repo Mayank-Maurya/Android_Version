@@ -53,10 +53,7 @@ public class AnswerSubmit extends AppCompatActivity {
         if(firebaseAuth.getCurrentUser()!=null)
         {
             AnswerSubmit.setOnClickListener(view -> {
-
-
                 String Answer=AnswerContent.getText().toString();
-
                 Map<String,Object> map=new HashMap<>();
                 map.put("content",Answer);
                 map.put("upvote",0);
@@ -65,43 +62,62 @@ public class AnswerSubmit extends AppCompatActivity {
                 map.put("userId",userid);
                 map.put("questionID",id);
                 map.put("timestamp", FieldValue.serverTimestamp());
-
                 firebasedb.collection("answer")
                         .add(map)
                         .addOnSuccessListener(documentReference -> {
-
                             Map<String,Object> m=new HashMap<>();
                             m.put("answerID",documentReference.getId());
                             m.put("timestamp",map.get("timestamp"));
                             firebasedb.collection("question")
                                     .document(id)
                                     .collection("answers")
-                                    .add(m)
-                                    .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<DocumentReference> task) {
-                                            Toast.makeText(AnswerSubmit.this,"up in question",Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
+                                    .add(m);
                             firebasedb.collection("users")
                                     .document(userid)
                                     .collection("answers")
-                                    .add(m)
-                                    .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<DocumentReference> task) {
-                                            Toast.makeText(AnswerSubmit.this,"up in users",Toast.LENGTH_SHORT).show();
+                                    .add(m);
+                        }).addOnCompleteListener(task -> {
+                            finish();
+                });
 
-                                        }
-                                    });
 
-                        })
-                        .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                            @Override
-                            public void onComplete(@NonNull Task<DocumentReference> task) {
-                                finish();
-                            }
-                        });
+//                firebasedb.collection("question")
+//                        .document(id)
+//                        .collection("answers")
+//                        .add(map)
+//                        .addOnSuccessListener(documentReference -> {
+//                            Map<String,Object> m=new HashMap<>();
+//                            m.put("answerID",documentReference.getId());
+//                            m.put("timestamp",map.get("timestamp"));
+//                            firebasedb.collection("question")
+//                                    .document(id)
+//                                    .collection("answers")
+//                                    .add(m)
+//                                    .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+//                                        @Override
+//                                        public void onComplete(@NonNull Task<DocumentReference> task) {
+//                                            Toast.makeText(AnswerSubmit.this,"up in question",Toast.LENGTH_SHORT).show();
+//                                        }
+//                                    });
+//                            firebasedb.collection("users")
+//                                    .document(userid)
+//                                    .collection("answers")
+//                                    .add(m)
+//                                    .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+//                                        @Override
+//                                        public void onComplete(@NonNull Task<DocumentReference> task) {
+//                                            Toast.makeText(AnswerSubmit.this,"up in users",Toast.LENGTH_SHORT).show();
+//
+//                                        }
+//                                    });
+
+//                        })
+//                        .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+//                            @Override
+//                            public void onComplete(@NonNull Task<DocumentReference> task) {
+//                                finish();
+//                            }
+//                        });
 
 
             });

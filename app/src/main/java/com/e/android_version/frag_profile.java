@@ -38,7 +38,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import static android.app.Activity.RESULT_OK;
 
 public class frag_profile extends Fragment {
-
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private Uri Profileimageuri=null;
@@ -54,12 +53,8 @@ public class frag_profile extends Fragment {
     private TextView queryasked;
     private String mParam1;
     private String mParam2;
-
     public frag_profile() {
-
-
     }
-
     public static frag_profile newInstance(String param1, String param2) {
         frag_profile fragment = new frag_profile();
         Bundle args = new Bundle();
@@ -68,7 +63,6 @@ public class frag_profile extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -217,9 +211,6 @@ public class frag_profile extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-
-
-
     }
 
 }

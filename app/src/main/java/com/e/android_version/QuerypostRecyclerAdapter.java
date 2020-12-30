@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -21,22 +22,27 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import java.sql.Time;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class QuerypostRecyclerAdapter extends RecyclerView.Adapter<QuerypostRecyclerAdapter.ViewHolder> {
 
 
-    FirebaseFirestore firebaseFirestore;
+   private FirebaseFirestore firebaseFirestore;
+    private FirebaseAuth firebaseAuth;
     private Context context;
-    private String id="";
     public List<QueryPost> queryPostList;
     public QuerypostRecyclerAdapter(List<QueryPost> queryPostList)
     {
@@ -52,6 +58,7 @@ public class QuerypostRecyclerAdapter extends RecyclerView.Adapter<QuerypostRecy
 
         context=parent.getContext();
         firebaseFirestore=FirebaseFirestore.getInstance();
+        firebaseAuth=FirebaseAuth.getInstance();
 
 
         return new ViewHolder(view);
@@ -60,28 +67,26 @@ public class QuerypostRecyclerAdapter extends RecyclerView.Adapter<QuerypostRecy
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.setIsRecyclable(false);
+        String userId=firebaseAuth.getCurrentUser().getUid();
         String title=queryPostList.get(position).getQuestiontitle();
-        int likes=queryPostList.get(position).getLikes();
         int views=queryPostList.get(position).getViews();
         int comments=queryPostList.get(position).getComments();
         String name=queryPostList.get(position).getName();
         String userid=queryPostList.get(position).getUserId();
        final String questionId=queryPostList.get(position).getQuestionId();
-
-       // id=questionId;
-       
-
-       // String datestring= queryPostList.get(position).getTimestamp().toString();
-
-       // FieldValue timestamp =queryPostList.get(position).getTimestamp();
-
         holder.setQuestionTitle(title);
-        holder.setLikes(likes);
         holder.setviews(views);
         holder.setComments(comments);
         holder.setName(name);
         holder.setProfileimg(userid);
-       // holder.setQuestionId(questionId);
+        firebaseFirestore.collection("question")
+                .document(questionId)
+                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                        holder.setLikes( value.getLong("likes").intValue());
+                    }
+                });
 
         holder.questionTitle.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,6 +95,60 @@ public class QuerypostRecyclerAdapter extends RecyclerView.Adapter<QuerypostRecy
                 intent.putExtra("doc_id",questionId);
                 context.startActivity(intent);
             }
+        });
+
+        firebaseFirestore.collection("question")
+                .document(questionId)
+                .collection("likes")
+                .document(userId)
+                .addSnapshotListener((value, error) -> {
+
+                    if(value.exists())
+                    {
+                        holder.likesbtn.setImageDrawable(context.getDrawable(R.drawable.ic_like2));
+                    }else{
+                        holder.likesbtn.setImageDrawable(context.getDrawable(R.drawable.ic_like));
+
+                    }
+
+                });
+
+
+
+
+        holder.likesbtn.setOnClickListener(view -> {
+            firebaseFirestore.collection("question")
+                    .document(questionId)
+                    .collection("likes")
+                    .document(userId)
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if(!task.getResult().exists())
+                        {
+                            Map<String,Object> mp=new HashMap<>();
+                            mp.put("timestamp",FieldValue.serverTimestamp());
+                            firebaseFirestore.collection("question")
+                                    .document(questionId)
+                                    .collection("likes")
+                                    .document(userId)
+                                    .set(mp);
+                            firebaseFirestore.collection("question")
+                                    .document(questionId)
+                                    .update("likes",FieldValue.increment(1));
+                        }else{
+                            firebaseFirestore.collection("question")
+                                    .document(questionId)
+                                    .collection("likes")
+                                    .document(userId)
+                                    .delete();
+                            firebaseFirestore.collection("question")
+                                    .document(questionId)
+                                    .update("likes",FieldValue.increment(-1));
+
+                        }
+                    });
+
+
         });
 
         //holder.setTime(datestring);
@@ -101,7 +160,7 @@ public class QuerypostRecyclerAdapter extends RecyclerView.Adapter<QuerypostRecy
         return queryPostList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
 
         private View view;
@@ -122,30 +181,36 @@ public class QuerypostRecyclerAdapter extends RecyclerView.Adapter<QuerypostRecy
             super(itemView);
 
             view=itemView;
+            questionTitle=view.findViewById(R.id.querypost_asked_question);
+            likes=view.findViewById(R.id.querypost_likes);
+            views=view.findViewById(R.id.querypost_views);
+            comments=view.findViewById(R.id.querypost_answers);
+            name=view.findViewById(R.id.querypost_username);
+            profileimg=view.findViewById(R.id.querypost_circle_view);
+            likesbtn=view.findViewById(R.id.querypost_likesimage);
+
+
+
+
+
 
         }
 
-        public void setQuestionId(String doc_id)
-        {
-            id=doc_id;
-        }
 
         public void setQuestionTitle(String text)
         {
-            questionTitle=view.findViewById(R.id.querypost_asked_question);
+
 
             questionTitle.setText(text);
         }
         public void setLikes(int likes_no)
         {
-            likes=view.findViewById(R.id.querypost_likes);
 
             likes.setText(String.valueOf(likes_no));
 
         }
         public void setviews(int views_no)
         {
-            views=view.findViewById(R.id.querypost_views);
 
 
             views.setText(String.valueOf(views_no));
@@ -153,24 +218,14 @@ public class QuerypostRecyclerAdapter extends RecyclerView.Adapter<QuerypostRecy
         }
         public void setComments(int comments_no)
         {
-            comments=view.findViewById(R.id.querypost_answers);
-
             comments.setText(String.valueOf(comments_no));
-
         }
         public void setName(String name1)
         {
-            name=view.findViewById(R.id.querypost_username);
-
             name.setText(name1);
-
         }
-
         public void setProfileimg(String user_id)
         {
-
-            profileimg=view.findViewById(R.id.querypost_circle_view);
-
             firebaseFirestore.collection("users").document(user_id)
                     .get()
                     .addOnCompleteListener(task -> {
@@ -195,30 +250,7 @@ public class QuerypostRecyclerAdapter extends RecyclerView.Adapter<QuerypostRecy
                                         .into(profileimg);
                             }
                         }
-
-
                     });
-
-
-
         }
-
-
-        @Override
-        public void onClick(View view) {
-
-
-
-
-        }
-//        public void setTime(String date)
-//        {
-//            timestamp=view.findViewById(R.id.querypost_timstamp);
-//
-//            timestamp.setText(date);
-//
-//        }
-
-
     }
 }

@@ -129,7 +129,7 @@
                     app:layout_constraintTop_toBottomOf="@id/querypostans_downvote"
                     app:layout_constraintLeft_toRightOf="@id/querypostans_likesimage"
                     android:layout_marginLeft="70dp"
-                    android:src="@drawable/ic_views"
+                    android:src="@drawable/ic_downvote"
                     android:padding="3dp" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>

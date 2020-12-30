@@ -1,5 +1,4 @@
 package com.e.android_version;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -37,9 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
 public class Add_Post extends AppCompatActivity {
-
     private Button addpost;
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebasedb;
@@ -55,7 +52,6 @@ public class Add_Post extends AppCompatActivity {
     private Uri post_img_uri=null;
     private  String name="";
     private String Downloadurl="";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,12 +74,10 @@ public class Add_Post extends AppCompatActivity {
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-
                         if(task.isSuccessful())
                         {
                             name=task.getResult().get("name").toString();
                         }
-
                     }
                 });
         imageView.setOnClickListener(view -> {
@@ -91,16 +85,11 @@ public class Add_Post extends AppCompatActivity {
                     .setGuidelines(CropImageView.Guidelines.ON)
                     .setAspectRatio(1, 1)
                     .start(this);
-
-
         });
         addpost.setOnClickListener(view -> {
             progressBar.setVisibility(View.VISIBLE);
             if(firebaseAuth.getCurrentUser()!=null)
             {
-
-
-
                 String title=Title.getText().toString();
                 String body=Body.getText().toString();
                 String tag1=Tag1.getText().toString();
@@ -118,27 +107,18 @@ public class Add_Post extends AppCompatActivity {
                 dataset.put("profileimg",Downloadurl);
                 dataset.put("questionId","_");
                 dataset.put("userId",firebaseAuth.getCurrentUser().getUid());
-
-
-
                 firebasedb.collection("question")
                         .add(dataset)
                         .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                             @Override
                             public void onSuccess(DocumentReference documentReference) {
-
-
-
                                 if(post_img_uri!=null)
                                 {
                                     StorageReference image_path = storageReference.child("post_images").child(UUID.randomUUID().toString()+".jpg");
-
                                     image_path.putFile(post_img_uri)
                                             .addOnCompleteListener(task -> {
-
                                                 if(task.isSuccessful())
                                                 {
-
                                                     image_path.getDownloadUrl().addOnSuccessListener(uri -> {
                                                         Downloadurl=uri.toString();
                                                         Map<String,Object> mp=new HashMap<>();
@@ -146,34 +126,23 @@ public class Add_Post extends AppCompatActivity {
                                                         firebasedb.collection("question").document(documentReference.getId())
                                                                 .update(mp);
                                                     });
-
                                                 }
-
-
-
                                             });
-
                                 }
                             }
                         })
                         .addOnCompleteListener(task -> {
-
                             if(task.isSuccessful())
                             {
-
                                 Map<String,Object> mp1=new HashMap<>();
                                 mp1.put("questionId",task.getResult().getId());
-                                mp1.put("timestamp",FieldValue.serverTimestamp());
-
+                                mp1.put("timestamp",dataset.get("timestamp"));
                                 firebasedb.collection("users")
                                         .document(firebaseAuth.getCurrentUser().getUid())
                                         .collection("questions")
                                         .add(mp1);
-
-
                                 Map<String,Object> mp=new HashMap<>();
                                 mp.put("questionId",task.getResult().getId());
-
                                 firebasedb.collection("question")
                                         .document(task.getResult().getId())
                                         .update(mp);
@@ -187,29 +156,14 @@ public class Add_Post extends AppCompatActivity {
                                 startActivity(new Intent(Add_Post.this, MainActivity.class));
                                 this.finish();
                             }
-
                         });
-
-
-
-
-
-
-
-
-
             }else{
-
                 Toast.makeText(Add_Post.this,"User haven't logged in.",Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(Add_Post.this, LoginActivity.class));
                 this.finish();
             }
-
-
-
         });
     }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -217,7 +171,6 @@ public class Add_Post extends AppCompatActivity {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
                 post_img_uri = result.getUri();
-
                 imageView.setImageURI(post_img_uri);
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
