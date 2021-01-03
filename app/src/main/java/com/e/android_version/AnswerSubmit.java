@@ -27,7 +27,7 @@ public class AnswerSubmit extends AppCompatActivity {
     private Button AnswerSubmit;
     private FirebaseFirestore firebasedb;
     private FirebaseAuth firebaseAuth;
-   private String username;
+    private String username;
     private String userid;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +76,12 @@ public class AnswerSubmit extends AppCompatActivity {
                                     .document(userid)
                                     .collection("answers")
                                     .add(m);
+                            firebasedb.collection("users")
+                                    .document(userid)
+                                    .update("total_answer",FieldValue.increment(1));
+                            firebasedb.collection("question")
+                                    .document(id)
+                                    .update("answercount",FieldValue.increment(1));
                         }).addOnCompleteListener(task -> {
                             finish();
                 });

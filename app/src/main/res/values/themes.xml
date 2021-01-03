@@ -1,6 +1,6 @@
 <resources>
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar"  >
         Customize your theme here.
         <item name="colorPrimary">#2196F3</item>
         <item name="colorPrimaryDark">#F9F9FA</item>
@@ -8,6 +8,7 @@
         <item name="android:statusBarColor">#AB0FED</item>
 
     </style>
+
 
     <style name="Divider">
         <item name="android:background">?android:attr/listDivider</item>

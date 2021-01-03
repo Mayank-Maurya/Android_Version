@@ -73,6 +73,7 @@ public class Fragment_home extends Fragment {
         querypostRecyclerAdapter=new QuerypostRecyclerAdapter(queryPostList);
         querypost_recyclerView.setLayoutManager(new LinearLayoutManager(container.getContext()));
         querypost_recyclerView.setAdapter(querypostRecyclerAdapter);
+        querypost_recyclerView.setItemViewCacheSize(20);
         firebaseAuth=FirebaseAuth.getInstance();
         firebaseFirestore=FirebaseFirestore.getInstance();
         //Sorting the queries in descending order w.r.t timestamp
@@ -125,13 +126,8 @@ public class Fragment_home extends Fragment {
                 .orderBy("timestamp",Query.Direction.DESCENDING)
                 .startAfter(lastvisible)
                 .limit(6);
-
-
-
-
         nextQuery.addSnapshotListener((value, error) -> {
             if(isAdded()){
-
                 if(error!=null)
                 {
                     Toast.makeText(getContext(),"Nothing found",Toast.LENGTH_SHORT).show();
@@ -141,15 +137,10 @@ public class Fragment_home extends Fragment {
                 if(!value.isEmpty())
                 {
                     lastvisible = value.getDocuments().get(value.size() -1);
-
-
                     for(DocumentChange doc: value.getDocumentChanges())
                     {
-
                         if(doc.getType() == DocumentChange.Type.ADDED)
                         {
-                           // String querypostid=doc.getDocument().getId();
-
                             QueryPost queryPost=doc.getDocument().toObject(QueryPost.class);
                             queryPostList.add(queryPost);
                             querypostRecyclerAdapter.notifyDataSetChanged();
@@ -180,7 +171,6 @@ public class Fragment_home extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
         if(mBundleRecyclerViewState!=null)
         {
             Parcelable listState = mBundleRecyclerViewState.getParcelable(KEY_RECYCLER_STATE);

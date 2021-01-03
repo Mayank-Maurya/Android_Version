@@ -146,6 +146,9 @@ public class Add_Post extends AppCompatActivity {
                                 firebasedb.collection("question")
                                         .document(task.getResult().getId())
                                         .update(mp);
+                                firebasedb.collection("users")
+                                        .document(firebaseAuth.getCurrentUser().getUid())
+                                        .update("query_asked",FieldValue.increment(1));
                                 progressBar.setVisibility(View.GONE);
                                 Toast.makeText(Add_Post.this,"Successfully asked a question",Toast.LENGTH_SHORT).show();
                                 startActivity(new Intent(Add_Post.this, MainActivity.class));

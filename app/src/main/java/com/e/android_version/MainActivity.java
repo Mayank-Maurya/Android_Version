@@ -1,7 +1,12 @@
  package com.e.android_version;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
@@ -10,6 +15,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,10 +38,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private CircleImageView nav_image_view;
     private FirebaseFirestore firebasedb;
     private TextView name_tv;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toolbar toolbar=findViewById(R.id.toolbar);
+        AppCompatDelegate
+                .setDefaultNightMode(
+                        AppCompatDelegate
+                                .MODE_NIGHT_YES);
+
+        setSupportActionBar(toolbar);
+        DrawerLayout drawerLayout=findViewById(R.id.drawer_layout);
+        ImageButton opendrawer=findViewById(R.id.imagebutton);
+        opendrawer.setOnClickListener(view -> {
+            drawerLayout.openDrawer(GravityCompat.START);
+        });
         mAuth= FirebaseAuth.getInstance();
         firebasedb=FirebaseFirestore.getInstance();
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -60,10 +80,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             .priority(Priority.HIGH)
                             .dontAnimate()
                             .dontTransform();
-                    Glide.with(MainActivity.this)
+                    Glide.with(getApplicationContext())
                             .load(task.getResult().get("profileimg").toString())
                             .apply(options)
                             .into(nav_image_view);
+
                 }
 
             });

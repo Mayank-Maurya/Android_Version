@@ -14,6 +14,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.core.OrderBy;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -73,7 +74,6 @@ public class QueryPostAnswers extends AppCompatActivity {
             Query firstquery=firebaseFirestore.collection("question")
                     .document(id)
                     .collection("answers")
-                    .orderBy("timestamp",Query.Direction.DESCENDING)
                     .limit(6);
 
             firstquery.addSnapshotListener(((value, error) -> {
@@ -82,6 +82,7 @@ public class QueryPostAnswers extends AppCompatActivity {
                     Toast.makeText(this, "Congratulations! you're first one to answer\nNo Answers yet", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
                 if (firstpageload) {
                     try {
                         lastvisible = value.getDocuments().get(value.size() - 1);
@@ -91,7 +92,8 @@ public class QueryPostAnswers extends AppCompatActivity {
                     }
 
                 }
-                for (DocumentChange doc : value.getDocumentChanges()) {
+                if(value.size()>0)
+                {for (DocumentChange doc : value.getDocumentChanges()) {
 
                     if (doc.getType() == DocumentChange.Type.ADDED) {
 
@@ -99,18 +101,24 @@ public class QueryPostAnswers extends AppCompatActivity {
                                 .document(doc.getDocument().getString("answerID"))
                                 .get()
                                 .addOnSuccessListener(documentSnapshot -> {
-                                    QueryPostAns queryPostAns=documentSnapshot.toObject(QueryPostAns.class);
-                                    if (firstpageload) {
-                                        queryPostansList.add(queryPostAns);
-                                    } else {
-                                        queryPostansList.add(0, queryPostAns);
+                                    if(documentSnapshot.exists())
+                                    {
+                                        QueryPostAns queryPostAns=documentSnapshot.toObject(QueryPostAns.class);
+                                        if (firstpageload) {
+                                            queryPostansList.add(queryPostAns);
+                                        } else {
+                                            queryPostansList.add(0, queryPostAns);
+                                        }
+                                        querypostansRecyclerAdapter.notifyDataSetChanged();
                                     }
-                                    querypostansRecyclerAdapter.notifyDataSetChanged();
+
 
                                 });
                     }
                 }
-                firstpageload = false;
+                    firstpageload = false;
+
+                }
             }));
         }
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -118,39 +126,51 @@ public class QueryPostAnswers extends AppCompatActivity {
             Intent intent=new Intent(this,AnswerSubmit.class);
             intent.putExtra("question_id",id);
             startActivity(intent);
+            finish();
         });
     }
 
     void loadmorepost()
     {
-        Query nextquery=firebaseFirestore.collection("question")
-                .document(id)
-                .collection("answers")
-                .orderBy("timestamp",Query.Direction.DESCENDING)
-                .startAfter(lastvisible)
-                .limit(6);
-        nextquery.addSnapshotListener(((value, error) -> {
-            if(error!=null)
-            {
-                Toast.makeText(this, "Congratulations! you're first one to answer\nNo Answers yet", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if(!value.isEmpty())
-            {
-                lastvisible = value.getDocuments().get(value.size() - 1);
-                for (DocumentChange doc : value.getDocumentChanges()) {
-                    if (doc.getType() == DocumentChange.Type.ADDED) {
-                        firebaseFirestore.collection("answer")
-                                .document(doc.getDocument().getString("answerID"))
-                                .get()
-                                .addOnSuccessListener(documentSnapshot -> {
-                                    QueryPostAns queryPostAns=documentSnapshot.toObject(QueryPostAns.class);
-                                    queryPostansList.add( queryPostAns);
-                                    querypostansRecyclerAdapter.notifyDataSetChanged();
-                                });
-                    }
+        if(lastvisible!=null)
+        {
+            Query nextquery=firebaseFirestore.collection("question")
+                    .document(id)
+                    .collection("answers")
+                    .startAfter(lastvisible)
+                    .limit(6);
+            nextquery.addSnapshotListener(((value, error) -> {
+                if(error!=null)
+                {
+                    Toast.makeText(this, "Congratulations! you're first one to answer\nNo Answers yet", Toast.LENGTH_SHORT).show();
+                    return;
                 }
-            }
-        }));
+                if(value.size()>0)
+                {
+                    lastvisible = value.getDocuments().get(value.size() - 1);
+                    if(lastvisible!=null)
+                    {
+                        for (DocumentChange doc : value.getDocumentChanges()) {
+                            if (doc.getType() == DocumentChange.Type.ADDED) {
+                                firebaseFirestore.collection("answer")
+                                        .document(doc.getDocument().getString("answerID"))
+                                        .get()
+                                        .addOnSuccessListener(documentSnapshot -> {
+                                            if(documentSnapshot.exists()) {
+                                                QueryPostAns queryPostAns = documentSnapshot.toObject(QueryPostAns.class);
+                                                queryPostansList.add(queryPostAns);
+                                                querypostansRecyclerAdapter.notifyDataSetChanged();
+                                            }
+                                        });
+                            }
+                        }
+
+                    }
+
+                }
+            }));
+
+        }
+
     }
 }

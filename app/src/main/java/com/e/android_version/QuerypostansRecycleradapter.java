@@ -42,13 +42,13 @@ public class QuerypostansRecycleradapter extends RecyclerView.Adapter<Queryposta
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final QueryPostAns item=queryPostAnsList.get(position);
-        String content=queryPostAnsList.get(position).getContent();
+       // String content=queryPostAnsList.get(position).getContent();
         String name=queryPostAnsList.get(position).getName();
         String userid=queryPostAnsList.get(position).getUserId();
         int dvote=queryPostAnsList.get(position).getDownvote();
         int uvote=queryPostAnsList.get(position).getUpvote();
         holder.setName(name);
-        holder.setQuestionContent(content);
+        //holder.setQuestionContent(content);
         holder.setUpvote(uvote);
         holder.setDownvote(dvote);
         holder.setProfileimg(userid);

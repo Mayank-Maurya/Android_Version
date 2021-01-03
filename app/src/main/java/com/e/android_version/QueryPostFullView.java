@@ -1,6 +1,7 @@
 package com.e.android_version;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -21,10 +22,15 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.auth.User;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 public class QueryPostFullView extends AppCompatActivity {
 
@@ -61,34 +67,51 @@ public class QueryPostFullView extends AppCompatActivity {
 
         if(isuserexists!=null)
         {
-
             new MyTask().doInBackground(id);
-
-            firebasedb.collection("question").document(id)
-                    .get()
-                    .addOnCompleteListener(task -> {
-
-                        if(! task.getResult().getString("mainQuestion").isEmpty())
+            new MyTask2().doInBackground(id);
+            Map<String,Object> mp=new HashMap<>();
+            mp.put("timestamp", FieldValue.serverTimestamp());
+            firebasedb.collection("question")
+                    .document(id)
+                    .collection("views")
+                    .document(firebaseAuth.getCurrentUser().getUid())
+                    .addSnapshotListener((value, error) -> {
+                        if(!value.exists())
                         {
-                            String msgtext=task.getResult().getString("mainQuestion")+"\n";
-                            mainquestiontext.setText(msgtext);
-                            //getting question image
-                            {
-                                RequestOptions requestOptions=new RequestOptions()
-                                        .centerCrop()
-                                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                        .priority(Priority.HIGH)
-                                        .dontAnimate()
-                                        .dontTransform();
-                                Glide.with(getApplicationContext())
-                                        .load(task.getResult().getString("profileimg"))
-                                        .apply(requestOptions)
-                                        .into(mainquesionImage);
+                            firebasedb.collection("question")
+                                    .document(id)
+                                    .collection("views")
+                                    .document(firebaseAuth.getCurrentUser().getUid())
+                                    .set(mp)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            firebasedb.collection("question")
+                                                    .document(id)
+                                                    .update("views",FieldValue.increment(1));
+                                            firebasedb.collection("question")
+                                                    .document(id)
+                                                    .get()
+                                                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                            if(task.isSuccessful())
+                                                            {
+                                                                String x=task.getResult().getString("userId");
+                                                                firebasedb.collection("users")
+                                                                        .document(x)
+                                                                        .update("total_views",FieldValue.increment(1));
+                                                            }
+                                                        }
+                                                    });
+                                        }
+                                    });
 
-                            }
+
                         }
 
                     });
+
         }
     }
 
@@ -129,6 +152,44 @@ public class QueryPostFullView extends AppCompatActivity {
 
                         }
                     });
+            return "";
+
+        }
+    }
+    private class MyTask2 extends AsyncTask<String,Void,String>{
+        @Override
+        protected String doInBackground(String... strings) {
+            String url=strings[0];
+            return doFetch(url);
+        }
+
+        private String doFetch(String url) {
+            firebasedb.collection("question").document(url)
+                    .get()
+                    .addOnCompleteListener(task -> {
+
+                        if(! task.getResult().getString("mainQuestion").isEmpty())
+                        {
+                            String msgtext=task.getResult().getString("mainQuestion")+"\n";
+                            mainquestiontext.setText(msgtext);
+                            //getting question image
+                            {
+                                RequestOptions requestOptions=new RequestOptions()
+                                        .centerCrop()
+                                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                        .priority(Priority.HIGH)
+                                        .dontAnimate()
+                                        .dontTransform();
+                                Glide.with(getApplicationContext())
+                                        .load(task.getResult().getString("profileimg"))
+                                        .apply(requestOptions)
+                                        .into(mainquesionImage);
+
+                            }
+                        }
+
+                    });
+
             return "";
 
         }

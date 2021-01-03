@@ -1,5 +1,6 @@
 package com.e.android_version;
 
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -7,7 +8,10 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 //perfect version
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,13 +27,21 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -51,8 +63,21 @@ public class frag_profile extends Fragment {
     private TextView totalviews;
     private TextView totallikes;
     private TextView queryasked;
+    private TextView contribution,achievement,phone,dob;
+    private String user=null;
     private String mParam1;
     private String mParam2;
+    private RecyclerView profilerecyclerview;
+    private List<QueryPostprofile> queryPostprofileList;
+    private Querypostprofileadapter querypostprofileadapter;
+    private DocumentSnapshot lastvisible;
+    private Boolean firstpageload=true;
+    private TextView Activity,about;
+    private Boolean isactivityclicked=true;
+    private Boolean isaboutclicked=false;
+    private ConstraintLayout constraintLayout;
+
+
     public frag_profile() {
     }
     public static frag_profile newInstance(String param1, String param2) {
@@ -78,17 +103,63 @@ public class frag_profile extends Fragment {
                              Bundle savedInstanceState) {
         final View rootview=inflater.inflate(R.layout.fragment_frag_profile, container, false);
         profileimage= rootview.findViewById(R.id.Profile_image);
+        queryPostprofileList=new ArrayList<>();
+        profilerecyclerview=rootview.findViewById(R.id.Profile_recylerview);
+        querypostprofileadapter=new Querypostprofileadapter(queryPostprofileList);
+        profilerecyclerview.setLayoutManager(new LinearLayoutManager(container.getContext()));
+        profilerecyclerview.setAdapter(querypostprofileadapter);
         mAuth=FirebaseAuth.getInstance();
         nametv=rootview.findViewById(R.id.Profile_name);
+        constraintLayout=rootview.findViewById(R.id.cl_about);
         emailtv=rootview.findViewById(R.id.Profile_email);
         totallikes=rootview.findViewById(R.id.Profile_query_likes);
         totalviews=rootview.findViewById(R.id.Profile_query_Views);
+        Activity=rootview.findViewById(R.id.tvactivity);
+        about=rootview.findViewById(R.id.tvaAbout);
+        contribution=rootview.findViewById(R.id.profileabout_contributions);
+        achievement=rootview.findViewById(R.id.profileabout_achievement);
+        dob=rootview.findViewById(R.id.profileabout_dob);
+        phone=rootview.findViewById(R.id.profileabout_phoneno);
         queryasked=rootview.findViewById(R.id.Profile_query_asked);
         firebasedb=FirebaseFirestore.getInstance();
         firebaseStorage=FirebaseStorage.getInstance();
         storageReference =firebaseStorage.getReference();
-        String user=mAuth.getCurrentUser().getUid();
+        user=mAuth.getCurrentUser().getUid();
         StorageReference image_path=storageReference.child("Profile_Image").child(user+".jpg");
+
+        if(isactivityclicked)
+        {
+            Activity.setBackgroundResource(R.color.navy_blue);
+        }
+        if(isaboutclicked)
+        {
+            about.setBackgroundResource(R.color.navy_blue);
+        }
+        about.setOnClickListener(view -> {
+            if(isactivityclicked)
+            {
+                profilerecyclerview.setAlpha(0);
+                isactivityclicked=false;
+                isaboutclicked=true;
+                constraintLayout.setVisibility(View.VISIBLE);
+                about.setBackgroundResource(R.color.navy_blue);
+                Activity.setBackgroundResource(R.color.white);
+
+            }
+        });
+        Activity.setOnClickListener(view -> {
+            if(isaboutclicked)
+            {
+                profilerecyclerview.setAlpha(1);
+                isaboutclicked=false;
+                isactivityclicked=true;
+                constraintLayout.setVisibility(View.GONE);
+                about.setBackgroundResource(R.color.white);
+                Activity.setBackgroundResource(R.color.navy_blue);
+            }
+
+        });
+
         if(mAuth.getCurrentUser() != null) {
             String id = mAuth.getCurrentUser().getUid();
             //database
@@ -97,9 +168,36 @@ public class frag_profile extends Fragment {
                     if (task.isSuccessful()) {
                         emailtv.setText(task.getResult().get("email").toString());
                         nametv.setText(task.getResult().get("name").toString());
-                        totallikes.setText(String.valueOf(((Long) task.getResult().get("total_answer")).intValue()));
-                        totalviews.setText(String.valueOf(((Long) task.getResult().get("total_views")).intValue()));
-                        queryasked.setText(String.valueOf(((Long) task.getResult().get("query_asked")).intValue()));
+                        ValueAnimator valueAnimator = ValueAnimator.ofInt(0, ((Long) task.getResult().get("total_answer")).intValue());
+                        valueAnimator.setDuration(1500);
+                        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                            @Override
+                            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                                totallikes.setText(valueAnimator.getAnimatedValue().toString());
+                            }
+                        });
+                        valueAnimator.start();
+                        ValueAnimator valueAnimator1 = ValueAnimator.ofInt(0, ((Long) task.getResult().get("total_views")).intValue());
+                        valueAnimator1.setDuration(1500);
+                        valueAnimator1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                            @Override
+                            public void onAnimationUpdate(ValueAnimator valueAnimator1) {
+                                totalviews.setText(valueAnimator1.getAnimatedValue().toString());
+                            }
+                        });
+                        valueAnimator1.start();
+                        ValueAnimator valueAnimator2 = ValueAnimator.ofInt(0, ((Long) task.getResult().get("query_asked")).intValue());
+                        valueAnimator2.setDuration(1500);
+                        valueAnimator2.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                            @Override
+                            public void onAnimationUpdate(ValueAnimator valueAnimator2) {
+                                queryasked.setText(valueAnimator2.getAnimatedValue().toString());
+                            }
+                        });
+                        valueAnimator2.start();
+//                        totallikes.setText(String.valueOf(((Long) task.getResult().get("total_answer")).intValue()));
+//                        totalviews.setText(String.valueOf(((Long) task.getResult().get("total_views")).intValue()));
+//                        queryasked.setText(String.valueOf(((Long) task.getResult().get("query_asked")).intValue()));
                         if(task.getResult().get("profileimg").toString() != null)
                         {
 
@@ -118,6 +216,11 @@ public class frag_profile extends Fragment {
 
                         }
 
+                        Map<String,Object> aboutmap= (Map<String, Object>) task.getResult().get("about");
+                        contribution.setText(aboutmap.get("contribution").toString());
+                        achievement.setText(aboutmap.get("achievements").toString());
+                        phone.setText(task.getResult().getString("phone"));
+                        dob.setText(task.getResult().getString("dob"));
                     } else {
                         Toast.makeText(getActivity(), "found nothing", Toast.LENGTH_SHORT).show();
                     }
@@ -126,6 +229,61 @@ public class frag_profile extends Fragment {
 
 
             });
+
+
+
+           profilerecyclerview.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    Boolean reachedBottom=!recyclerView.canScrollVertically(1);
+                    if(reachedBottom)
+                    {
+                        Toast.makeText(getContext(),"Reached",Toast.LENGTH_SHORT).show();
+                        loadpost();
+                    }
+                }
+            });
+            Query firstQuery=firebasedb.collection("users")
+                   .document(user)
+                    .collection("questions")
+                    .limit(3);
+
+            firstQuery.addSnapshotListener(((value, error) -> {
+                if(isAdded())
+                {
+                    if (error != null) {
+                        Toast.makeText(frag_profile.this.getContext(), "Nothing found", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    if (firstpageload) {
+                        lastvisible = value.getDocuments().get(value.size() - 1);
+                    }
+                    if(!value.isEmpty())
+                    {
+                        for (DocumentChange doc : value.getDocumentChanges()) {
+                            if (doc.getType() == DocumentChange.Type.ADDED) {
+
+                                firebasedb.collection("question")
+                                        .document(doc.getDocument().getString("questionId"))
+                                        .get()
+                                        .addOnSuccessListener(documentSnapshot -> {
+                                            QueryPostprofile queryPostprofile = documentSnapshot.toObject(QueryPostprofile.class);
+                                            if (firstpageload) {
+                                                queryPostprofileList.add(queryPostprofile);
+                                            } else {
+                                                queryPostprofileList.add(0, queryPostprofile);
+                                            }
+                                            querypostprofileadapter.notifyDataSetChanged();
+                                        });
+                            }
+                        }
+                        firstpageload = false;
+
+                    }
+
+                }
+            }));
         }
 
         profileimage.setOnClickListener(view -> {
@@ -211,6 +369,47 @@ public class frag_profile extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+    }
+    void loadpost()
+    {
+        if(lastvisible!=null && user!=null) {
+
+            Query firstQuery=firebasedb.collection("users")
+                    .document(user)
+                    .collection("questions")
+                    .startAfter(lastvisible)
+                    .limit(3);
+
+            firstQuery.addSnapshotListener(((value, error) -> {
+                if(isAdded())
+                {
+                    if (error != null) {
+                        Toast.makeText(frag_profile.this.getContext(), "Nothing found", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    if(!value.isEmpty())
+                    {
+                            lastvisible = value.getDocuments().get(value.size() - 1);
+                        for (DocumentChange doc : value.getDocumentChanges()) {
+                            if (doc.getType() == DocumentChange.Type.ADDED) {
+
+                                firebasedb.collection("question")
+                                        .document(doc.getDocument().getString("questionId"))
+                                        .get()
+                                        .addOnSuccessListener(documentSnapshot -> {
+                                            QueryPostprofile queryPostprofile = documentSnapshot.toObject(QueryPostprofile.class);
+                                            queryPostprofileList.add(queryPostprofile);
+                                            querypostprofileadapter.notifyDataSetChanged();
+                                        });
+                            }
+                        }
+
+                    }
+
+                }
+            }));
+        }
+
     }
 
 }
