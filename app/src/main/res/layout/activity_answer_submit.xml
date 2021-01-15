@@ -17,6 +17,7 @@
             android:layout_height="wrap_content"
             android:text="Submit Your Answer here!"
             android:textStyle="bold"
+            android:layout_marginLeft="10dp"
             android:textColor="@color/black"
             android:textSize="25dp" />
         <EditText
@@ -25,6 +26,8 @@
             android:id="@+id/addanswer_content"
             android:background="@color/white"
             android:gravity="top|left"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             style="@android:style/Widget.Material.EditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

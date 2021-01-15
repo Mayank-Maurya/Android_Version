@@ -14,7 +14,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".profile_view"></activity>
+        <activity android:name=".App_About"></activity>
+        <activity android:name=".Onboarding" />
+        <activity android:name=".Settings" />
+        <activity android:name=".profile_view" />
         <activity android:name=".AnswerSubmit" />
         <activity
             android:name=".QueryPostAnswers"
@@ -27,14 +30,8 @@
         <activity android:name=".Add_Post" />
         <activity android:name=".SignupActivity" />
         <activity android:name=".LoginActivity" />
+        <activity android:name=".MainActivity" />
         <activity android:name=".LaunchScreen">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -101,7 +101,12 @@ public class Fragment_home extends Fragment {
                         return;
                     }
                     if (firstpageload) {
-                        lastvisible = value.getDocuments().get(value.size() - 1);
+                        try {
+                            lastvisible = value.getDocuments().get(value.size() - 1);
+                        }catch (ArrayIndexOutOfBoundsException e)
+                        {
+                            e.printStackTrace();
+                        }
                     }
                     for (DocumentChange doc : value.getDocumentChanges()) {
                         if (doc.getType() == DocumentChange.Type.ADDED) {
@@ -130,10 +135,9 @@ public class Fragment_home extends Fragment {
             if(isAdded()){
                 if(error!=null)
                 {
-                    Toast.makeText(getContext(),"Nothing found",Toast.LENGTH_SHORT).show();
+                    error.printStackTrace();
                     return;
                 }
-
                 if(!value.isEmpty())
                 {
                     lastvisible = value.getDocuments().get(value.size() -1);
@@ -145,15 +149,10 @@ public class Fragment_home extends Fragment {
                             queryPostList.add(queryPost);
                             querypostRecyclerAdapter.notifyDataSetChanged();
                         }
-
                     }
-
                 }
-
-
             }
         });
-
     }
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {

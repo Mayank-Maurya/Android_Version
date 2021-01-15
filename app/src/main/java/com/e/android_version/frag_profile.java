@@ -1,6 +1,7 @@
 package com.e.android_version;
 
 import android.animation.ValueAnimator;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -76,6 +77,7 @@ public class frag_profile extends Fragment {
     private Boolean isactivityclicked=true;
     private Boolean isaboutclicked=false;
     private ConstraintLayout constraintLayout;
+    private Context context;
 
 
     public frag_profile() {
@@ -103,6 +105,7 @@ public class frag_profile extends Fragment {
                              Bundle savedInstanceState) {
         final View rootview=inflater.inflate(R.layout.fragment_frag_profile, container, false);
         profileimage= rootview.findViewById(R.id.Profile_image);
+        context=container.getContext();
         queryPostprofileList=new ArrayList<>();
         profilerecyclerview=rootview.findViewById(R.id.Profile_recylerview);
         querypostprofileadapter=new Querypostprofileadapter(queryPostprofileList);
@@ -209,7 +212,7 @@ public class frag_profile extends Fragment {
                                     .priority(Priority.HIGH)
                                     .dontAnimate()
                                     .dontTransform();
-                            Glide.with(getContext())
+                            Glide.with(context)
                                     .load(task.getResult().get("profileimg").toString())
                                     .apply(options)
                                     .into(profileimage);
@@ -257,7 +260,12 @@ public class frag_profile extends Fragment {
                         return;
                     }
                     if (firstpageload) {
-                        lastvisible = value.getDocuments().get(value.size() - 1);
+                        try {
+                            lastvisible = value.getDocuments().get(value.size() - 1);
+                        }catch (ArrayIndexOutOfBoundsException e)
+                        {
+                           e.printStackTrace();
+                        }
                     }
                     if(!value.isEmpty())
                     {
@@ -311,6 +319,7 @@ public class frag_profile extends Fragment {
 
                                       String download=uri.toString();
                                       Toast.makeText(getActivity(),download+"",Toast.LENGTH_SHORT).show();
+                                      profileimage.setImageURI(uri);
 
                                       Map<String , Object> mp=new HashMap<>();
                                       mp.put("profileimg",download);

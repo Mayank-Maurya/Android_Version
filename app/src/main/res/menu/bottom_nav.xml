@@ -2,8 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:id="@+id/home" android:title="Home" android:icon="@drawable/ic_home" />
-    <item android:id="@+id/fire" android:title="fire" android:icon="@drawable/ic_fire"/>
+    <item android:id="@+id/settings" android:title="Settings" android:icon="@drawable/ic_serach"/>
     <item android:id="@+id/addpost" android:title="AddPost" android:icon="@drawable/icon_postadd"/>
+    <item android:id="@+id/fire" android:title="fire" android:icon="@drawable/ic_fire"/>
     <item android:id="@+id/person" android:title="profile" android:icon="@drawable/ic_person"/>
-    <item android:id="@+id/settings" android:title="Settings" android:icon="@drawable/ic_settings"/>
+
 </menu>

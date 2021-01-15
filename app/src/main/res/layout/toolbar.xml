@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.Toolbar
+    xmlns:android="http://schemas.android.com/apk/res/android"
    android:id="@+id/toolbar"
     android:layout_width="match_parent"
-    android:layout_height="40dp"
+    android:layout_height="50dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white"
     android:elevation="4dp"
@@ -10,22 +11,25 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginLeft="0dp">
         <ImageButton
             android:id="@+id/imagebutton"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:background="@color/white"
-            android:src="@drawable/ic_person"/>
+            android:src="@drawable/ic_sidebar"
+            android:layout_marginTop="12dp"
+            />
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="40dp"
+            android:layout_height="45dp"
             android:text="Community Discuss"
-            android:textSize="21dp"
+            android:textSize="24dp"
             app:layout_scrollFlags="scroll|enterAlways|snap"
-            android:layout_marginTop="3dp"
             android:textColor="@color/black"
-            android:textStyle="bold|italic"
+            android:textStyle="bold"
+            android:gravity="center"
             android:layout_marginLeft="50dp"/>
     </LinearLayout>
 

@@ -23,7 +23,7 @@
         tools:layout="@layout/fragment_frag_fire" />
     <fragment
         android:id="@+id/settings"
-        android:name="com.e.android_version.frag_settings"
+        android:name="com.e.android_version.frag_search"
         android:label="fragment_frag_settings"
         tools:layout="@layout/fragment_frag_settings" />
     <activity

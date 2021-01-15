@@ -11,7 +11,9 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,11 +45,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        checkFirstRun();
         Toolbar toolbar=findViewById(R.id.toolbar);
         AppCompatDelegate
                 .setDefaultNightMode(
                         AppCompatDelegate
                                 .MODE_NIGHT_YES);
+        Context context=getApplicationContext();
 
         setSupportActionBar(toolbar);
         DrawerLayout drawerLayout=findViewById(R.id.drawer_layout);
@@ -80,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             .priority(Priority.HIGH)
                             .dontAnimate()
                             .dontTransform();
-                    Glide.with(getApplicationContext())
+                    Glide.with(context)
                             .load(task.getResult().get("profileimg").toString())
                             .apply(options)
                             .into(nav_image_view);
@@ -132,8 +136,46 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
                 return true;
 
+            case R.id.Settings:
+                if(mAuth.getCurrentUser()!=null)
+                {
+                    startActivity(new Intent(MainActivity.this,Settings.class));
+                }
+
             default:return true;
         }
 
+    }
+    private void checkFirstRun() {
+
+        final String PREFS_NAME = "MyPrefsFile";
+        final String PREF_VERSION_CODE_KEY = "version_code";
+        final int DOESNT_EXIST = -1;
+
+        // Get current version code
+        int currentVersionCode = BuildConfig.VERSION_CODE;
+
+        // Get saved version code
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        int savedVersionCode = prefs.getInt(PREF_VERSION_CODE_KEY, DOESNT_EXIST);
+
+        // Check for first run or upgrade
+        if (currentVersionCode == savedVersionCode) {
+
+            // This is just a normal run
+            return;
+
+        } else if (savedVersionCode == DOESNT_EXIST) {
+
+            startActivity(new Intent(MainActivity.this,Onboarding.class));
+            finish();
+
+        } else if (currentVersionCode > savedVersionCode) {
+
+            // TODO This is an upgrade
+        }
+
+        // Update the shared preferences with the current version code
+        prefs.edit().putInt(PREF_VERSION_CODE_KEY, currentVersionCode).apply();
     }
 }
