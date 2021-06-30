@@ -107,7 +107,7 @@ Contributions are what make the open source community such an amazing place to b
 ## Contact
 
 Your Name - Mayank Maurya
-Project Link: [https://github.com/Mayank-Maurya/Android_Version](Community Discussion)
+Project Link: [https://github.com/Mayank-Maurya/Android_Version] (Community Discussion)
 
 
 
