@@ -11,7 +11,7 @@
   <h3 align="center"> Community Discussion </h3>
 
   <p align="center">
-    <a href="https://live-texteditor.herokuapp.com/">View Demo By Forking App</a>
+    <a>APP LOGO</a>
 </p>
 
 
